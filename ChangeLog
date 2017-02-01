@@ -1,0 +1,19 @@
+Changes from qiew-0.3.8 to qiew-0.3.10
+======================================
+
+Martin Wojtczyk <wojtczyk@in.tum.de>
+	- Only some slight changes with cmake
+
+Changes from qiew-0.3.8 to qiew-0.3.9
+=====================================
+
+Martin Wojtczyk <wojtczyk@in.tum.de>
+	- Switched from cvs repository to svn repository
+	- Added LICENSE file
+	- Added ChangeLog file
+
+Version 0.3.8
+=============
+
+Martin Wojtczyk <wojtczyk@in.tum.de>
+	- First published version

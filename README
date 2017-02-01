@@ -1,0 +1,21 @@
+Dependencies
+============
+
+CMake 2.0.3
+http://www.cmake.org/
+
+Coin3D 2.3.0 & SoQt 1.2.0 & simage-1 1.6.1
+http://www.coin3d.org/
+
+Qt 3.3.3
+http://www.trolltech.com/
+
+
+Build
+=====
+
+mkdir build
+cd build
+cmake ..
+make
+make install
