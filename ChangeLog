@@ -1,13 +1,119 @@
+Changes from qiew-0.5.2 to qiew-0.5.3
+=======================================
+
+Martin Wojtczyk <martin.wojtczyk@gmail.com>
+	- wrl and iv icons for Mac
+	- wrl and iv file associations on Mac
+	- resource file update
+	- Application Macro update
+	- Moved Resource Files under application source
+
+Changes from qiew-0.5.1 to qiew-0.5.2
+=======================================
+
+Martin Wojtczyk <martin.wojtczyk@gmail.com>
+	- Using QApplication to handle Apple's openFile Events
+	- registering file types on Macintosh
+
+Changes from qiew-0.5.0 to qiew-0.5.1
+=======================================
+
+Martin Wojtczyk <martin.wojtczyk@gmail.com>
+	- Copyright note updates
+	- head inclusion order updates
+
+Changes from qiew-0.4.11 to qiew-0.5.0
+=======================================
+
+Martin Wojtczyk <martin.wojtczyk@gmail.com>
+	- New Icons for Windows, Mac, Linux.
+
+Changes from qiew-0.4.10 to qiew-0.4.11
+=======================================
+
+Martin Wojtczyk <martin.wojtczyk@gmail.com>
+	- Solved return from Full Screen bug.
+
+Changes from qiew-0.4.9 to qiew-0.4.10
+=======================================
+
+Martin Wojtczyk <martin.wojtczyk@gmail.com>
+	- Identified bug Full Screen not Full Screen. The error comes from the menu
+	  bar: In Full Screen mode the menubar is disabled. This also disables the
+	  keyboard shortcuts. Todo: solve
+
+Changes from qiew-0.4.8 to qiew-0.4.9
+======================================
+
+Martin Wojtczyk <martin.wojtczyk@gmail.com>
+	- Mac OS X resources working
+
+Changes from qiew-0.4.7 to qiew-0.4.8
+======================================
+
+Martin Wojtczyk <martin.wojtczyk@gmail.com>
+	- Linux resources working
+
+Changes from qiew-0.4.6 to qiew-0.4.7
+======================================
+
+Martin Wojtczyk <martin.wojtczyk@gmail.com>
+	- Windows resources working
+
+Changes from qiew-0.4.5 to qiew-0.4.6
+======================================
+
+Martin Wojtczyk <martin.wojtczyk@gmail.com>
+	- removed status bar and replaced status messages by warning boxes
+	- disabled decorations by default
+
+Changes from qiew-0.4.4 to qiew-0.4.5
+======================================
+
+Martin Wojtczyk <martin.wojtczyk@gmail.com>
+	- added menu item and actions to toggle Feedback Visibility
+
+Changes from qiew-0.4.3 to qiew-0.4.4
+======================================
+
+Martin Wojtczyk <martin.wojtczyk@gmail.com>
+	- Minor bugfixes
+
+Changes from qiew-0.4.2 to qiew-0.4.3
+======================================
+
+Martin Wojtczyk <martin.wojtczyk@gmail.com>
+	- Modified cmake build scripts
+
+Changes from qiew-0.4.1 to qiew-0.4.2
+======================================
+
+Martin Wojtczyk <martin.wojtczyk@gmail.com>
+	- Fixed FindCoin.cmake to find a Framework installation of Coin on Mac OS X.
+	- Fixed signals/slots to comply with Qt-4.x
+
+Changes from qiew-0.4.0 to qiew-0.4.1
+======================================
+
+Martin Wojtczyk <martin.wojtczyk@gmail.com>
+	- Fixed Threading issues due to Qt4 port.
+
+Changes from qiew-0.3.10 to qiew-0.4.0
+======================================
+
+Martin Wojtczyk <martin.wojtczyk@gmail.com>
+	- Ported/Rewritten for Qt4.
+
 Changes from qiew-0.3.8 to qiew-0.3.10
 ======================================
 
-Martin Wojtczyk <wojtczyk@in.tum.de>
+Martin Wojtczyk <martin.wojtczyk@gmail.com>
 	- Only some slight changes with cmake
 
 Changes from qiew-0.3.8 to qiew-0.3.9
 =====================================
 
-Martin Wojtczyk <wojtczyk@in.tum.de>
+Martin Wojtczyk <martin.wojtczyk@gmail.com>
 	- Switched from cvs repository to svn repository
 	- Added LICENSE file
 	- Added ChangeLog file
@@ -15,5 +121,5 @@ Martin Wojtczyk <wojtczyk@in.tum.de>
 Version 0.3.8
 =============
 
-Martin Wojtczyk <wojtczyk@in.tum.de>
+Martin Wojtczyk <martin.wojtczyk@gmail.com>
 	- First published version

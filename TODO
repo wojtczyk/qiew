@@ -2,5 +2,10 @@ Currently Missing Features
 ==========================
 
 * Documentation
-* Coordinate Axes Separation
 * Save File
+
+Known Issues
+============
+
+Version 0.4.1 to 0.4.3 does not return from Fullscreen mode on Linux. You need to exit the
+application.

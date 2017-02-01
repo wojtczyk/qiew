@@ -1,0 +1,20 @@
+################################################################################
+# Qiew.desktop
+#
+# Created on: Jan 29, 2011
+# Copyright Martin Wojtczyk <martin.wojtczyk@gmail.com>
+################################################################################
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Qiew
+GenericName=VRML/Inventor Viewer
+NoDisplay=false
+Comment=View VRML or Inventor Files
+Icon=Qiew.png
+Hidden=false
+TryExec=Qiew
+Exec=Qiew %f
+Terminal=false
+MimeType=x-world/x-vrml;object/x-inventor;graphics/x-inventor
+Categories=Graphics

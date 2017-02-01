@@ -1,14 +1,28 @@
+qiew - A minimalistic VRML/Inventor-Viewer based on SoQt, coin3d, Qt
+started 06.12.2004 by Martin Wojtczyk <martin.wojtczyk@gmail.com>
+http://www.qiew.org
+
 Dependencies
 ============
 
-CMake 2.0.3
+CMake 2.4
 http://www.cmake.org/
 
-Coin3D 2.3.0 & SoQt 1.2.0 & simage-1 1.6.1
+Qt 4.3.2
+http://www.trolltech.com/
+
+Coin3D 2.4.6 & SoQt 1.4.1 & simage-1 1.6.1
 http://www.coin3d.org/
 
-Qt 3.3.3
-http://www.trolltech.com/
+Please make sure SoQt is configured for and linked against Qt4! The application
+might compile otherwise but would crash on execution. You can verify the SoQt
+configuration by launching:
+	soqt-config --libs
+For Qt4 it should say sth like: 
+	-lSoQt -lQtOpenGL -lQtGui -lQt3Support...
+instead of 
+	-lSoQt -lqt-mt...
+for Qt3.
 
 
 Build
@@ -19,3 +33,24 @@ cd build
 cmake ..
 make
 make install
+
+Dependencies on Ubuntu 10.04 LTS
+================================
+
+- cmake
+- libqt4-dev
+- libqt4-opengl-dev
+- libcoin60-dev
+- libsoqt4-dev
+- libsimage-dev
+
+Dependencies on Mac OS X 10.6 Snow Leopard
+==========================================
+
+- cmake
+- QtCore.framework
+- QtGui.framework
+- QtOpenGL.framework
+- Inventor.framework
+- SoQt.framework
+- libsimage.dylib

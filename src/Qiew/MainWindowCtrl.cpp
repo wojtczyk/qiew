@@ -1,3 +1,11 @@
+/******************************************************************************
+ * MainWindowCtrl.cpp
+ *
+ * Created on: Dec 6, 2004
+ * Copyright Martin Wojtczyk <martin.wojtczyk@gmail.com>
+ *
+ * MainWindowCtrl is the Controller of the generated Qt GUI elements.
+ ******************************************************************************/
 #include <Inventor/Qt/SoQt.h>
 #include <Inventor/Qt/viewers/SoQtExaminerViewer.h>
 #include <Inventor/SoDB.h>
@@ -10,108 +18,134 @@
 #include <Inventor/VRMLnodes/SoVRMLMaterial.h>
 #include <Inventor/VRMLnodes/SoVRMLTransform.h>
 #include <Inventor/misc/SoChildList.h>
-#include <qfiledialog.h>
-#include <qmessagebox.h>
-#include <qmenubar.h>
-#include <qstatusbar.h>
-#include <qtoolbutton.h>
-#include <qgl.h>
-#include <qimage.h>
-#include <qstrlist.h>
+#include <QMainWindow>
+#include <QMessageBox>
+#include <QFileDialog>
+#include <QWidget>
+#include <QGLWidget>
 #include <string>
 #include <exception>
 #include <stdexcept>
-#include <simhelper/soqt/SaveDialogGl.h>
 #include "config.h"
-#include "FormMain.h"
-#include "FormMainCtrl.h"
+#include "ui_MainWindow.h"
+#include "MainWindowCtrl.h"
 
 using namespace std;
-using namespace simhelper::soqt;
 
-const int FormMainCtrl::STATUSBAR_MSG_DURATION = 5000;
-
-FormMainCtrl::FormMainCtrl(FormMain* formMain, QObject* parent, const char* name)
-	:QObject(parent, name)
+MainWindowCtrl::MainWindowCtrl(QMainWindow* mainWindow,
+	Ui::MainWindow* uiMainWindow)
+	:QObject(mainWindow)
 {
-	this->formMain = formMain;
+	this->mainWindow = mainWindow;
+	this->uiMainWindow = uiMainWindow;
 
-	SoQt::init(formMain);
-
+	SoQt::init(mainWindow);
+	SoDB::init();
+	
 	sceneRoot = new SoSeparator;
 	sceneRoot->ref();
 	axesRoot = new SoVRMLTransform;
 	sceneRoot->addChild(axesRoot);
-
-	viewer = new SoQtExaminerViewer(formMain);
+	viewerWidget = new QWidget(mainWindow);
+	mainWindow->setCentralWidget(viewerWidget);
+	mainWindow->setWindowTitle(PACKAGE_NAME " " PACKAGE_VERSION);
+	mainWindow->setStatusBar(NULL); // disable the status bar
+	viewer = new SoQtExaminerViewer(viewerWidget);
 	viewer->setTransparencyType(SoGLRenderAction::SORTED_OBJECT_BLEND);
 	viewer->setSceneGraph(sceneRoot);
+	viewer->setDecoration(false);
 	viewer->show();
+	addAxes();
+	viewer->resetToHomePosition();
 	viewer->viewAll();
+	removeAxes();
 	viewer->setFeedbackVisibility(true);
 	viewer->setFeedbackSize(10);
-	formMain->setCentralWidget(viewer->getWidget());
-	formMain->setCaption(PACKAGE_NAME " " PACKAGE_VERSION);
+	mainWindow->setFocusProxy(viewer->getWidget());
 
-	// hide the toolbar by default
-	formMain->toolbar->hide();
+	QObject::connect((QObject*) this->uiMainWindow->actionOpen, SIGNAL(triggered()), this, SLOT(slotActionOpen()));
+	QObject::connect((QObject*) this->uiMainWindow->actionReload, SIGNAL(triggered()), this, SLOT(slotActionReload()));
+	QObject::connect((QObject*) this->uiMainWindow->actionTakeScreenshot, SIGNAL(triggered()), this, SLOT(slotActionTakeScreenshot()));
+	QObject::connect((QObject*) this->uiMainWindow->actionExit, SIGNAL(triggered()), this, SLOT(slotActionExit()));
+	QObject::connect((QObject*) this->uiMainWindow->actionCoordinateAxes, SIGNAL(toggled(bool)), this, SLOT(slotActionCoordinateAxes(bool)));
+	QObject::connect((QObject*) this->uiMainWindow->actionFeedbackVisibility, SIGNAL(triggered()), this, SLOT(slotActionFeedbackVisibility()));
+	QObject::connect((QObject*) this->uiMainWindow->actionFullScreen, SIGNAL(triggered()), this, SLOT(slotActionFullScreen()));
+	QObject::connect((QObject*) this->uiMainWindow->actionAbout, SIGNAL(triggered()), this, SLOT(slotActionAbout()));
 
-	QObject::connect((QObject*) this->formMain->fileOpenAction, SIGNAL(activated()), this, SLOT(slotFileOpenAction()));
-	QObject::connect((QObject*) this->formMain->fileReloadAction, SIGNAL(activated()), this, SLOT(slotFileReloadAction()));
-	QObject::connect((QObject*) this->formMain->fileTake_ScreenshotAction, SIGNAL(activated()), this, SLOT(slotFileTake_ScreenshotAction()));
-	QObject::connect((QObject*) this->formMain->fileExitAction, SIGNAL(activated()), this, SLOT(slotFileExitAction()));
-	QObject::connect((QObject*) this->formMain->viewCoordinate_AxesAction, SIGNAL(toggled(bool)), this, SLOT(slotViewCoordinate_AxesAction(bool)));
-	QObject::connect((QObject*) this->formMain->viewFullScreenAction, SIGNAL(toggled(bool)), this, SLOT(slotViewFullScreenAction(bool)));
-	QObject::connect((QObject*) this->formMain->helpAboutAction, SIGNAL(activated()), this, SLOT(slotHelpAboutAction()));
+	// Add actions to the main window. This way the keyboard shortcuts are
+	// available in Full Screen mode, too
+//	mainWindow->addAction(uiMainWindow->actionOpen);
+	mainWindow->addAction(uiMainWindow->actionReload);
+//	mainWindow->addAction(uiMainWindow->actionTakeScreenshot);
+	mainWindow->addAction(uiMainWindow->actionExit);
+	mainWindow->addAction(uiMainWindow->actionCoordinateAxes);
+	mainWindow->addAction(uiMainWindow->actionFeedbackVisibility);
+	mainWindow->addAction(uiMainWindow->actionFullScreen);
 };
 
-FormMainCtrl::~FormMainCtrl()
+MainWindowCtrl::~MainWindowCtrl()
 {
 	sceneRoot->unref();
 	// delete viewer; Do not delete the viewer widget! It is deleted by its parent
 };
 
-void FormMainCtrl::slotFileOpenAction()
+void MainWindowCtrl::slotActionOpen()
 {
 	QString filter = "Supported Files (*.iv *.vrml *.wrl *.wrz *.wrl.gz);;VRML (*.wrl *.vrml *.wrz *.wrl.gz);;Open Inventor (*.iv)";
-	QString openFile = QFileDialog::getOpenFileName(QString::null, filter, formMain);
+	QString openFile = QFileDialog::getOpenFileName(mainWindow, "Open Model", QString::null, filter);
 
 	if (openFile != QString::null)
 	{
-		string filename = openFile.ascii(); 
+		string filename = openFile.toStdString(); 
 		load(filename);
 		viewer->resetToHomePosition();
 		viewer->viewAll();
 	}
 };
 
-void FormMainCtrl::slotFileReloadAction()
+void MainWindowCtrl::slotActionReload()
 {
 	load(this->filename);
 };
 
-void FormMainCtrl::slotFileTake_ScreenshotAction()
+void MainWindowCtrl::slotActionTakeScreenshot()
 {
-	try
+	QGLWidget* glWidget = (QGLWidget*) viewer->getGLWidget();
+	
+	QString filter = "Supported Image Formats (*.png *.jpg *.jpeg *.bmp *.ppm *.tiff *.xbm *.xpm)";
+	filter += ";;Portable Network Graphics (*.png)";
+	filter += ";;Joint Photographic Experts Group (*.jpg *.jpeg)";
+	filter += ";;Windows Bitmap (*.bmp)";
+	filter += ";;Portable Pixmap (*.ppm)";
+	filter += ";;Tagged Image File Format (*.tiff)";
+	filter += ";;X11 Bitmap(*.xbm)";
+	filter += ";;X11 Pixmap(*.xpm)";
+
+	QString saveFile = QFileDialog::getSaveFileName(mainWindow, "Save Screenshot", QString::null, filter);
+
+	if (!(saveFile.isNull() || saveFile.isEmpty()))
 	{
-		SaveDialogGL::show(viewer);
-	}
-	catch (std::runtime_error& e)
-	{
-		formMain->statusBar()->message(e.what(), STATUSBAR_MSG_DURATION);
+		// Repaint GL widget and grab a frame
+		glWidget->repaint();
+		QImage image = glWidget->grabFrameBuffer(true);
+
+		bool saved = image.save(saveFile, 0, 100);
+	
+		if ((saved == false))
+		{
+			QString error = "Error saving " + saveFile;
+			QMessageBox::warning(mainWindow, "Error", error);
+		};
 	};
 };
 
-void FormMainCtrl::slotFileExitAction()
+void MainWindowCtrl::slotActionExit()
 {
-	formMain->close();
+	mainWindow->close();
 };
 
-void FormMainCtrl::slotViewCoordinate_AxesAction(bool on)
+void MainWindowCtrl::slotActionCoordinateAxes(bool on)
 {
-	// set the toolbutton's state
-	formMain->toolButtonCoordinate_Axes->setOn(on);
-	
 	if (on)
 	{
 		addAxes();
@@ -122,41 +156,44 @@ void FormMainCtrl::slotViewCoordinate_AxesAction(bool on)
 	};
 };
 
-void FormMainCtrl::slotHelpAboutAction()
+void MainWindowCtrl::slotActionFeedbackVisibility()
 {
-	QString aboutString = PACKAGE_STRING "\n\n"
-		"by\tMartin Wojtczyk <" PACKAGE_BUGREPORT ">\n\n"
-		"parts by\n"
-		"\tMarkus Rickert\n"
-		"\tJakob Vogel\n\n"
-		"Some icons from eclipse and gnome :-)";
-	QMessageBox::about(formMain, PACKAGE_NAME, aboutString);
-};
-
-void FormMainCtrl::slotViewFullScreenAction(bool on)
-{
-	if (on)
+	if (viewer->isFeedbackVisible())
 	{
-		formMain->statusBar()->hide();
-		formMain->menuBarMain->hide();
-		formMain->toolbar->hide();
-		formMain->showFullScreen();
-		if ((bool) viewer->isDecoration() == true) viewer->setDecoration(false);
+		viewer->setFeedbackVisibility(false);
 	}
 	else
 	{
-		formMain->statusBar()->show();
-		formMain->menuBarMain->show();
-		formMain->showNormal();
-		if (viewer->isDecoration() == false) viewer->setDecoration(true);
-	};
-	// set the viewer's state
-	viewer->setFullScreen(on);
-	// set the toolbutton's state
-	formMain->toolButtonFullScreen->setOn(on);
+		viewer->setFeedbackVisibility(true);
+	}
 };
 
-void FormMainCtrl::load(std::string& filename)
+void MainWindowCtrl::slotActionAbout()
+{
+	QString aboutString = PACKAGE_STRING "\n\n"
+		"by " PACKAGE_BUGREPORT;
+	QMessageBox::about(mainWindow, PACKAGE_NAME, aboutString);
+};
+
+void MainWindowCtrl::slotActionFullScreen()
+{
+	if (!mainWindow->isFullScreen())
+	{
+		mainWindow->menuBar()->hide();
+		mainWindow->showFullScreen();
+		// viewer->setDecoration(false);
+		// viewer->setFullScreen(true);
+	}
+	else
+	{
+		mainWindow->menuBar()->show();
+		mainWindow->showNormal();
+		// viewer->setDecoration(true);
+		// viewer->setFullScreen(false);
+	};
+};
+
+void MainWindowCtrl::load(std::string& filename)
 {
 	if (filename != "")
 	{
@@ -168,7 +205,7 @@ void FormMainCtrl::load(std::string& filename)
 		if (in.openFile(filename.c_str()) == false)
 		{
 			QString error = "Error loading " + QString(filename.c_str());
-			formMain->statusBar()->message(error, STATUSBAR_MSG_DURATION);
+			QMessageBox::warning(mainWindow, "Error", error);
 		}
 		else
 		{
@@ -191,13 +228,13 @@ void FormMainCtrl::load(std::string& filename)
 			{
 				SoDB::writeunlock();
 				QString error = "Error loading " + QString(filename.c_str());
-				formMain->statusBar()->message(error, STATUSBAR_MSG_DURATION);
+				QMessageBox::warning(mainWindow, "Error", error);
 			};
 		};
 	};
 };
 
-void FormMainCtrl::addAxes()
+void MainWindowCtrl::addAxes()
 {
 	SoVRMLTransform* axes = new SoVRMLTransform();
 	axes->scale.setValue(0.25f, 0.25f, 0.25f);
@@ -315,10 +352,8 @@ void FormMainCtrl::addAxes()
 	zTextTransform->addChild(zText);
 };
 
-void FormMainCtrl::removeAxes()
+void MainWindowCtrl::removeAxes()
 {
-//	axesRoot->removeAllChildren();
-
 	SoDB::writelock();
 	sceneRoot->removeChild(axesRoot);
 	axesRoot = new SoVRMLTransform;

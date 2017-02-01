@@ -1,55 +1,18 @@
-PROJECT(QIEW_APPLICATION)
+################################################################################
+# CMakeLists.txt
+#
+# Created on: Jan 24, 2010
+# Copyright Martin Wojtczyk <martin.wojtczyk@gmail.com>
+################################################################################
+project(src)
 
-IF (CMAKE_BUILD_TYPE)
-	STRING(TOLOWER ${CMAKE_BUILD_TYPE} BUILD_TYPE)
-	STRING(COMPARE EQUAL ${BUILD_TYPE} "debug" DEBUG)
-	STRING(COMPARE EQUAL ${BUILD_TYPE} "relwithdebinfo" RELWITHDEBINFO)
-	IF (DEBUG OR RELWITHDEBINFO)
-		ADD_DEFINITIONS(-DDEBUG)
-	ENDIF (DEBUG OR RELWITHDEBINFO)
-ENDIF (CMAKE_BUILD_TYPE)
+# Make cmake search the following Modules directory
+set(CMAKE_MODULE_PATH "${${PROJECT_ROOT_NAME}_SOURCE_DIR}/Modules")
 
-INCLUDE(${CMAKE_ROOT}/Modules/FindQt3.cmake)
-INCLUDE(${QIEW_SOURCE_DIR}/Modules/FindCoin.cmake)
-INCLUDE(${QIEW_SOURCE_DIR}/Modules/FindSoQt.cmake)
-INCLUDE(${QIEW_SOURCE_DIR}/Modules/Findsimage.cmake)
+# Configure config.h and Doxyfile
+configure_file(${src_SOURCE_DIR}/config.h.in ${src_BINARY_DIR}/config.h)
+configure_file(${src_SOURCE_DIR}/Doxyfile.in ${src_BINARY_DIR}/Doxyfile)
 
-ADD_DEFINITIONS(-DCOIN_NOT_DLL -DSOQT_NOT_DLL ${QT_DEFINITIONS})
+# Application projects in subdirectories
+add_subdirectory(Qiew)
 
-CONFIGURE_FILE(${QIEW_APPLICATION_SOURCE_DIR}/config.h.in ${QIEW_APPLICATION_BINARY_DIR}/config.h)
-
-QT_WRAP_UI(qiew FORMMAIN_HEADERS FORMMAIN_SOURCES FormMain.ui)
-QT_WRAP_CPP(qiew FORMMAINCTRL_SOURCES FormMainCtrl.h)
-
-INCLUDE_DIRECTORIES(
-	${QT_INCLUDE_DIR}
-	${COIN_INCLUDE_DIR}
-	${SOQT_INCLUDE_DIR}
-	${QIEW_APPLICATION_BINARY_DIR}
-	${QIEW_APPLICATION_SOURCE_DIR}
-)
-
-SET(HDRS
-	FormMainCtrl.h
-	main.h
-	simhelper/soqt/SaveDialogGl.h
-)
-
-SET(SRCS
-	FormMainCtrl.cpp
-	main.cpp
-	simhelper/soqt/SaveDialogGl.cpp
-)	
-
-IF (WIN32)
-	ADD_EXECUTABLE(qiew WIN32 ${HDRS} ${SRCS} ${FORMMAIN_SOURCES} ${FORMMAINCTRL_SOURCES})
-ELSE (WIN32)
-	IF (APPLE)
-		ADD_EXECUTABLE(qiew MACOSX_BUNDLE ${HDRS} ${SRCS} ${FORMMAIN_SOURCES} ${FORMMAINCTRL_SOURCES})
-	ELSE(APPLE)
-		ADD_EXECUTABLE(qiew ${HDRS} ${SRCS} ${FORMMAIN_SOURCES} ${FORMMAINCTRL_SOURCES})
-	ENDIF(APPLE)
-ENDIF (WIN32)
-TARGET_LINK_LIBRARIES(qiew ${QT_LIBRARIES} ${COIN_LIBRARY} ${SOQT_LIBRARY})
-
-INSTALL(TARGETS qiew DESTINATION bin)

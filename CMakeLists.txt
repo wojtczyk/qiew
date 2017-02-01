@@ -1,39 +1,27 @@
-PROJECT(QIEW)
+################################################################################
+# CMakeLists.txt
+#
+# Created on: Jan 24, 2010
+# Copyright Martin Wojtczyk <martin.wojtczyk@gmail.com>
+################################################################################
+cmake_minimum_required(VERSION 2.8)
 
-SET(PACKAGE qiew)
-SET(VERSION 0.3.10)
+# Set the Project root name
+get_filename_component(PROJECT_ROOT_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
+set(PROJECT_ROOT_NAME Qiew)
+# Set the Project name
+project(${PROJECT_ROOT_NAME} CXX C)
 
-SET(PACKAGE_NAME ${PACKAGE})
-SET(PACKAGE_VERSION ${VERSION})
-SET(PACKAGE_BUGREPORT wojtczyk@in.tum.de)
-SET(PACKAGE_STRING "${PACKAGE_NAME} ${PACKAGE_VERSION} - A minimalistic VRML/Inventor Viewer")
-SET(PACKAGE_TARNAME ${PACKAGE})
+# Set Package Base Parameters
+set(PACKAGE ${PROJECT_NAME})
+set(VERSION 0.5.3)
 
-ADD_SUBDIRECTORY(src)
+set(PACKAGE_NAME ${PACKAGE})
+set(PACKAGE_VERSION ${VERSION})
+set(PACKAGE_BUGREPORT "Dr. Martin Wojtczyk")
+set(PACKAGE_STRING "${PROJECT_NAME} ${PACKAGE_VERSION} - A VRML/Inventor Viewer.")
+set(PACKAGE_TARNAME ${PACKAGE})
 
-INCLUDE(InstallRequiredSystemLibraries)
+add_subdirectory(src)
 
-SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY ${PACKAGE_STRING})
-SET(CPACK_PACKAGE_VENDOR ${PACKAGE_BUGREPORT})
-SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/README")
-SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/README")
-SET(CPACK_PACKAGE_VERSION_MAJOR "0")
-SET(CPACK_PACKAGE_VERSION_MINOR "3")
-SET(CPACK_PACKAGE_VERSION_PATCH "10")
-SET(CPACK_PACKAGE_INSTALL_DIRECTORY "CMake ${CMake_VERSION_MAJOR}.${CMake_VERSION_MINOR}")
-IF(WIN32 AND NOT UNIX)
-  # There is a bug in NSI that does not handle full unix paths properly. Make
-  # sure there is at least one set of four (4) backlasshes.
-  SET(CPACK_PACKAGE_ICON "${CMake_SOURCE_DIR}/Utilities/Release\\\\InstallIcon.bmp")
-  SET(CPACK_NSIS_INSTALLED_ICON_NAME "bin\\\\MyExecutable.exe")
-  SET(CPACK_NSIS_DISPLAY_NAME "${CPACK_PACKAGE_INSTALL_DIRECTORY} My Famous Project")
-  SET(CPACK_NSIS_HELP_LINK "http:\\\\\\\\www.my-project-home-page.org")
-  SET(CPACK_NSIS_URL_INFO_ABOUT "http:\\\\\\\\www.my-personal-home-page.com")
-  SET(CPACK_NSIS_CONTACT ${PACKAGE_BUGREPORT})
-  SET(CPACK_NSIS_MODIFY_PATH ON)
-ELSE(WIN32 AND NOT UNIX)
-#  SET(CPACK_STRIP_FILES "${QIEW_BINARY_DIR}/qiew.app")
-#  SET(CPACK_SOURCE_STRIP_FILES "")
-ENDIF(WIN32 AND NOT UNIX)
-SET(CPACK_PACKAGE_EXECUTABLES "qiew.app" "qiew")
-INCLUDE(CPack)
+include(CPack)
