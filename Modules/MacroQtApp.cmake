@@ -18,16 +18,18 @@ message(STATUS "Application: ${APP_NAME}")
 
 project(${APP_NAME})
 
-find_package(Qt4 4.4.3 COMPONENTS QtCore QtGui QtOpenGL REQUIRED)
 find_package(Coin REQUIRED)
 find_package(SoQt REQUIRED)
 find_package(simage)
 
-include(${QT_USE_FILE})
-add_definitions(-DCOIN_NOT_DLL -DSOQT_NOT_DLL ${QT_DEFINITIONS})
-QT4_WRAP_UI(MAINWINDOW_FILES MainWindow.ui)
-QT4_WRAP_CPP(MAINWINDOWCTRL_FILES MainWindowCtrl.h)
-QT4_WRAP_CPP(APPLICATION_FILES Application.h)
+find_package(Qt5Core)
+find_package(Qt5Gui)
+find_package(Qt5Widgets)
+find_package(Qt5OpenGL)
+
+qt5_wrap_ui(MAINWINDOW_FILES MainWindow.ui)
+qt5_wrap_cpp(MAINWINDOWCTRL_FILES MainWindowCtrl.h)
+qt5_wrap_cpp(APPLICATION_FILES Application.h)
 
 add_subdirectory(Resources)
 if (WIN32)
@@ -120,9 +122,15 @@ else (WIN32)
 endif (WIN32)
 
 target_link_libraries(${APP_NAME}
-	${QT_LIBRARIES}
 	${COIN_LIBRARY}
 	${SOQT_LIBRARY}
+)
+
+qt5_use_modules(${APP_NAME} 
+	Gui
+	OpenGL
+	Widgets
+	Concurrent
 )
 
 set_target_properties("${APP_NAME}" PROPERTIES DEBUG_POSTFIX "_debug")

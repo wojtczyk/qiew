@@ -54,7 +54,6 @@ MainWindowCtrl::MainWindowCtrl(QMainWindow* mainWindow,
 	viewer->setTransparencyType(SoGLRenderAction::SORTED_OBJECT_BLEND);
 	viewer->setSceneGraph(sceneRoot);
 	viewer->setDecoration(false);
-	viewer->show();
 	addAxes();
 	viewer->resetToHomePosition();
 	viewer->viewAll();
@@ -131,7 +130,7 @@ void MainWindowCtrl::slotActionTakeScreenshot()
 
 		bool saved = image.save(saveFile, 0, 100);
 	
-		if ((saved == false))
+		if (saved == false)
 		{
 			QString error = "Error saving " + saveFile;
 			QMessageBox::warning(mainWindow, "Error", error);
